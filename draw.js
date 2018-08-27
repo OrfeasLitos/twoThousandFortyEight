@@ -1,7 +1,10 @@
 function drawBox(box) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   if (box.full) {
-    ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2)
+    ctx.fillText('Game Over', canvas.width / 2,
+                 canvas.height / 2 - 15)
+    ctx.fillText(`score: ${box.score}`, canvas.width / 2,
+                 canvas.height / 2 + 15)
     return
   }
   for (x = 0; x < box.dim; x++) {
