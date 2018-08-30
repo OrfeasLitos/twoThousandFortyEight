@@ -5,9 +5,9 @@ class Box {
     this.score = 0
 
     this.squares = getArrayOfConstants(
-      this.dim * this.dim, new Square(0)
+      this.dim * this.dim, () => new Square(0)
     )
-    this.rows = this.squares.reduce(
+    const rows = this.squares.reduce(
       (acc, cur, i, arr) => {
         if (i % this.dim === 0) {
           acc.push(arr.slice(i, i + this.dim))
@@ -15,15 +15,22 @@ class Box {
         return acc
       }, []
     )
-    this.columns = this.squares.reduce(
-      (acc, cur) => {
+    this.rows = rows.map(x => new Vector(x))
+    const columns = this.squares.reduce(
+      (acc, cur, i) => {
         acc[i % this.dim].push(cur)
         return acc
-      }, getArrayOfConstants(this.dim, [])
+      }, getArrayOfConstants(this.dim, () => [])
     )
+    this.columns = columns.map(x => new Vector(x))
+  }
+
+  unsetMerges() {
+    this.squares.map(square => square.merged = false)
   }
 
   populate() {
+    this.unsetMerges()
     const num = randomElemFromArr([2, 4])
     if (this.getEmptySquares().length === 0) {
       this.full = true
@@ -57,22 +64,22 @@ class Box {
   move(dir) {
     switch (dir) {
       case 0:
-        for (row of this.rows) {
+        for (let row of this.rows) {
           this.score += row.move(-1)
         }
         break
       case 1:
-        for (column of this.columns) {
+        for (let column of this.columns) {
           this.score += column.move(-1)
         }
         break
       case 2:
-        for (row of this.rows) {
+        for (let row of this.rows) {
           this.score += row.move(1)
         }
         break
       case 3:
-        for (column of this.columns) {
+        for (let column of this.columns) {
           this.score += column.move(1)
         }
         break
@@ -83,18 +90,16 @@ class Box {
 }
 
 class Vector {
-  constructor(content) {
-    if (typeof content[0] === 'number') {
-      this.squares = content.map(x => new Square(x))
-    }
-    this.size = content.length
+  constructor(squares) {
+    this.size = squares.length
+    this.squares = squares
     // Add walls
-    this.content.unshift(new Square(-1))
-    this.content.push(new Square(-1))
+    this.squares.unshift(new Square(-1))
+    this.squares.push(new Square(-1))
   }
 
-  withinWalls(idx) {
-    return 0 < idx <= this.size
+  isWithinWalls(idx) {
+    return 0 < idx && idx <= this.size
   }
 
   move(dir) {
@@ -114,13 +119,15 @@ class Vector {
       throw new RangeError("move() accepts only -1 or 1")
     }
 
-    while (this.withinWalls(curIdx)) {
+    while (this.isWithinWalls(curIdx)) {
       const curSquare = this.squares[curIdx]
       const nextSquare = this.squares[nextIdx]
 
       if (curSquare.full) { // there is something to move
-        if (curSquare.num === nextSquare.num) { // merge
+        if (curSquare.num === nextSquare.num &&
+            !nextSquare.merged) { // merge
           curSquare.num = 0
+          nextSquare.merged = true
           nextSquare.num *= 2
           score += nextSquare.num
         }
