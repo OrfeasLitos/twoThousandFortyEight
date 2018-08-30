@@ -1,28 +1,29 @@
-// TODO: fix multiple collisions
 class Box {
-  constructor(H) {
+  constructor(dim) {
     this.full = false
-    this.dim = H
-    this.lines = []
+    this.dim = dim
     this.score = 0
-    for (let i = 0; i < H; i++) {
-      this.lines[i] = []
-      for (let j = 0; j < H; j++) {
-        this.lines[i][j] = new Square()
-      }
-    }
-  }
 
-  unsetMerges() {
-    for (let x = 0; x < this.dim; x++) {
-      for (let y = 0; y < this.dim; y++) {
-        this.getSquare(x, y).merged = false
-      }
-    }
+    this.squares = getArrayOfConstants(
+      this.dim * this.dim, new Square(0)
+    )
+    this.rows = this.squares.reduce(
+      (acc, cur, i, arr) => {
+        if (i % this.dim === 0) {
+          acc.push(arr.slice(i, i + this.dim))
+        }
+        return acc
+      }, []
+    )
+    this.columns = this.squares.reduce(
+      (acc, cur) => {
+        acc[i % this.dim].push(cur)
+        return acc
+      }, getArrayOfConstants(this.dim, [])
+    )
   }
 
   populate() {
-    this.unsetMerges()
     const num = randomElemFromArr([2, 4])
     if (this.getEmptySquares().length === 0) {
       this.full = true
@@ -33,14 +34,14 @@ class Box {
   }
 
   getEmptySquares() {
-    return this.lines.flat().filter(square => !square.full)
+    return this.squares.filter(square => !square.full)
   }
 
   print() {
     let res = '';
-    for (let y = 0; y < this.dim; y++) {
-      for (let x = 0; x < this.dim; x++) {
-        res += this.getSquare(x, y).num
+    for (let row = 0; row < this.dim; y++) {
+      for (let column = 0; column < this.dim; x++) {
+        res += this.getSquare(row, column).num
       }
       if (y !== this.dim - 1) {
         res += '\n'
@@ -49,221 +50,98 @@ class Box {
     console.log(res)
   }
 
-  getSquare(x, y) {
-    return this.lines[x][y]
+  getSquare(row, column) {
+    return this.squares[this.dim * column + row]
   }
 
-  // down
-  canMoveDown(x, y) {
-    if (y === this.dim - 1) {
-      return false
-    }
-    const next = this.getSquare(x, y + 1)
-    if (next.full && next.num !== this.getSquare(x, y).num) {
-      return false
-    }
-    return true
-  }
-
-  collideDownSquare(x, y) {
-    if (!this.canMoveDown(x, y)) {
-      return
-    }
-
-    let next = y + 1
-    while (next < this.dim && !this.getSquare(x, next).full) {
-      next++
-    }
-
-    if (next === this.dim) { // goes to top
-      this.getSquare(x, this.dim - 1).num = this.getSquare(x, y).num
-      this.getSquare(x, y).num = 0
-      return
-    }
-
-    if (this.getSquare(x, y).num ===
-        this.getSquare(x, next).num &&
-        !this.getSquare(x, next).merged) { // merge
-      this.getSquare(x, next).num *= 2
-      this.getSquare(x, y).num = 0
-      this.score += this.getSquare(y, next).num
-      this.getSquare(y, next).merged = true
-      return
-    }
-
-    this.getSquare(x, next - 1).num = this.getSquare(x, y).num
-    this.getSquare(x, y).num = 0
-  }
-
-  moveDown() {
-    for (let x = 0; x < this.dim; x++) {
-      for (let y = this.dim - 1; y >= 0; y--) {
-        if (this.getSquare(x, y).full) {
-          this.collideDownSquare(x, y)
+  move(dir) {
+    switch (dir) {
+      case 0:
+        for (row of this.rows) {
+          this.score += row.move(-1)
         }
-      }
-    }
-  }
-
-  // left
-  canMoveLeft(x, y) {
-    if (x === 0) {
-      return false
-    }
-    const next = this.getSquare(x - 1, y)
-    if (next.full && next.num !== this.getSquare(x, y).num) {
-      return false
-    }
-    return true
-  }
-
-  collideLeftSquare(x, y) {
-    if (!this.canMoveLeft(x, y)) {
-      return
-    }
-
-    let next = x - 1
-    while (next >= 0 && !this.getSquare(next, y).full) {
-      next--
-    }
-
-    if (next === -1) { // goes to the left
-      this.getSquare(0, y).num = this.getSquare(x, y).num
-      this.getSquare(x, y).num = 0
-      return
-    }
-
-    if (this.getSquare(x, y).num ===
-        this.getSquare(next, y).num &&
-        !this.getSquare(next, y).merged) { // merge
-      this.getSquare(next, y).num *= 2
-      this.getSquare(x, y).num = 0
-      this.score += this.getSquare(next, y).num
-      this.getSquare(next, y).merged = true
-      return
-    }
-
-    this.getSquare(next + 1, y).num = this.getSquare(x, y).num
-    this.getSquare(x, y).num = 0
-  }
-
-  moveLeft() {
-    for (let y = 0; y < this.dim; y++) {
-      for (let x = 0; x < this.dim; x++) {
-        if (this.getSquare(x, y).full) {
-          this.collideLeftSquare(x, y)
+        break
+      case 1:
+        for (column of this.columns) {
+          this.score += column.move(-1)
         }
-      }
-    }
-  }
-
-  // right
-  canMoveRight(x, y) {
-    if (x === this.dim - 1) {
-      return false
-    }
-    const next = this.getSquare(x + 1, y)
-    if (next.full && next.num !== this.getSquare(x, y).num) {
-      return false
-    }
-    return true
-  }
-
-  collideRightSquare(x, y) {
-    if (!this.canMoveRight(x, y)) {
-      return
-    }
-
-    let next = x + 1
-    while (next < this.dim && !this.getSquare(next, y).full) {
-      next++
-    }
-
-    if (next === this.dim) { // goes to the right
-      this.getSquare(this.dim - 1, y).num = this.getSquare(x, y).num
-      this.getSquare(x, y).num = 0
-      return
-    }
-
-    if (this.getSquare(x, y).num ===
-        this.getSquare(next, y).num &&
-        !this.getSquare(next, y).merged) { // merge
-      this.getSquare(next, y).num *= 2
-      this.getSquare(x, y).num = 0
-      this.score += this.getSquare(next, y).num
-      this.getSquare(next, y).merged = true
-      return
-    }
-
-    this.getSquare(next - 1, y).num = this.getSquare(x, y).num
-    this.getSquare(x, y).num = 0
-  }
-
-  moveRight() {
-    for (let y = 0; y < this.dim; y++) {
-      for (let x = this.dim - 1; x >= 0; x--) {
-        if (this.getSquare(x, y).full) {
-          this.collideRightSquare(x, y)
+        break
+      case 2:
+        for (row of this.rows) {
+          this.score += row.move(1)
         }
-      }
-    }
-  }
-
-  // up
-  canMoveUp(x, y) {
-    if (y === 0) {
-      return false
-    }
-    const next = this.getSquare(x, y - 1)
-    if (next.full && next.num !== this.getSquare(x, y).num) {
-      return false
-    }
-    return true
-  }
-
-  collideUpSquare(x, y) {
-    if (!this.canMoveUp(x, y)) {
-      return
-    }
-
-    let next = y - 1
-    while (next >= 0 && !this.getSquare(x, next).full) {
-      next--
-    }
-
-    if (next === -1) { // goes to top
-      this.getSquare(x, 0).num = this.getSquare(x, y).num
-      this.getSquare(x, y).num = 0
-      return
-    }
-
-    if (this.getSquare(x, y).num ===
-        this.getSquare(x, next).num &&
-        !this.getSquare(x, next).merged) { // merge
-      this.getSquare(x, next).num *= 2
-      this.getSquare(x, y).num = 0
-      this.score += this.getSquare(y, next).num
-      this.getSquare(x, next).merged = true
-      return
-    }
-
-    this.getSquare(x, next + 1).num = this.getSquare(x, y).num
-    this.getSquare(x, y).num = 0
-  }
-
-  moveUp() {
-    for (let x = 0; x < this.dim; x++) {
-      for (let y = 0; y < this.dim; y++) {
-        if (this.getSquare(x, y).full) {
-          this.collideUpSquare(x, y)
+        break
+      case 3:
+        for (column of this.columns) {
+          this.score += column.move(1)
         }
-      }
+        break
+      default:
+        throw new RangeError("Box.move() accepts 0 - 3")
     }
   }
 }
 
+class Vector {
+  constructor(content) {
+    if (typeof content[0] === 'number') {
+      this.squares = content.map(x => new Square(x))
+    }
+    this.size = content.length
+    // Add walls
+    this.content.unshift(new Square(-1))
+    this.content.push(new Square(-1))
+  }
+
+  withinWalls(idx) {
+    return 0 < idx <= this.size
+  }
+
+  move(dir) {
+    let nextIdx
+    let curIdx
+    let score = 0
+
+    if (dir === -1) {
+      nextIdx = 0
+      curIdx = 1
+    }
+    else if (dir === 1) {
+      nextIdx = this.size + 1
+      curIdx = this.size
+    }
+    else {
+      throw new RangeError("move() accepts only -1 or 1")
+    }
+
+    while (this.withinWalls(curIdx)) {
+      const curSquare = this.squares[curIdx]
+      const nextSquare = this.squares[nextIdx]
+
+      if (curSquare.full) { // there is something to move
+        if (curSquare.num === nextSquare.num) { // merge
+          curSquare.num = 0
+          nextSquare.num *= 2
+          score += nextSquare.num
+        }
+        else if (curIdx + dir !== nextIdx) { // there's moving space
+          this.squares[nextIdx - dir].num = curSquare.num
+          curSquare.num = 0
+          nextIdx -= dir
+        }
+        else { // no move
+          nextIdx -= dir
+        }
+      }
+      curIdx -= dir
+    }
+
+    return score
+  }
+}
+
 class Square {
-  constructor(n = 0) {
+  constructor(row, col, n = 0) {
     this.num = n
     this.merged = false
   }
