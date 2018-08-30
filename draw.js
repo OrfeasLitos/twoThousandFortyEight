@@ -1,10 +1,12 @@
 function drawBox(box) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  if (box.full) {
+  if (box.full && !box.hasMerge) {
     ctx.fillText('Game Over', canvas.width / 2,
                  (canvas.height - TEXTSIZE) / 2)
     ctx.fillText(`score: ${box.score}`, canvas.width / 2,
                  (canvas.height + TEXTSIZE) / 2)
+    box.print()
+    box.hasMerge
     return
   }
   for (x = 0; x < box.dim; x++) {

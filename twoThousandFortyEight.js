@@ -1,6 +1,5 @@
 class Box {
   constructor(dim) {
-    this.full = false
     this.dim = dim
     this.score = 0
 
@@ -29,13 +28,24 @@ class Box {
     this.squares.map(square => square.merged = false)
   }
 
+  get hasMerge() {
+    const columnsNrows = this.columns.concat(this.rows)
+    return columnsNrows.reduce((acc, vec) => {
+          if (acc) {
+            return true
+          }
+          return vec.hasMerge
+        }, false)
+  }
+
+  get full() {
+    return this.getEmptySquares().length === 0
+  }
+
+
   populate() {
     this.unsetMerges()
     const num = randomElemFromArr([2, 4])
-    if (this.getEmptySquares().length === 0) {
-      this.full = true
-      return
-    }
     const newSquare = randomElemFromArr(this.getEmptySquares())
     newSquare.num = num
   }
@@ -46,11 +56,12 @@ class Box {
 
   print() {
     let res = '';
-    for (let row = 0; row < this.dim; y++) {
-      for (let column = 0; column < this.dim; x++) {
+    for (let row = 0; row < this.dim; row++) {
+      for (let column = 0; column < this.dim; column++) {
         res += this.getSquare(row, column).num
+        res += '  '
       }
-      if (y !== this.dim - 1) {
+      if (row !== this.dim - 1) {
         res += '\n'
       }
     }
@@ -61,31 +72,39 @@ class Box {
     return this.squares[this.dim * column + row]
   }
 
+  moveVector(vec, dir) {
+    const res = vec.move(dir)
+    this.score += res[0]
+    return res[1]
+  }
+
   move(dir) {
+    let res = 0
     switch (dir) {
       case 0:
         for (let row of this.rows) {
-          this.score += row.move(-1)
+          res += this.moveVector(row, -1)
         }
         break
       case 1:
         for (let column of this.columns) {
-          this.score += column.move(-1)
+          res += this.moveVector(column, -1)
         }
         break
       case 2:
         for (let row of this.rows) {
-          this.score += row.move(1)
+          res += this.moveVector(row, 1)
         }
         break
       case 3:
         for (let column of this.columns) {
-          this.score += column.move(1)
+          res += this.moveVector(column, 1)
         }
         break
       default:
         throw new RangeError("Box.move() accepts 0 - 3")
     }
+    return res
   }
 }
 
@@ -102,10 +121,39 @@ class Vector {
     return 0 < idx && idx <= this.size
   }
 
+  get hasMerge() {
+    return this.squares.reduce((acc, square, i, vec) => {
+
+      // merge already found
+      if (acc) {
+        return true
+      }
+
+      // top/left wall, no merges
+      if (i === 0) {
+        return false
+      }
+
+      // down/right wall, pass on previous result
+      if (i === this.size + 1) {
+        return acc
+      }
+
+      // found available merge!
+      if (square.num === vec[i + 1].num) {
+        return true
+      }
+
+      // no merge here
+      return false
+    }, false) // no merges initially
+  }
+
   move(dir) {
     let nextIdx
     let curIdx
     let score = 0
+    let justMoved = false
 
     if (dir === -1) {
       nextIdx = 0
@@ -130,11 +178,13 @@ class Vector {
           nextSquare.merged = true
           nextSquare.num *= 2
           score += nextSquare.num
+          justMoved = true
         }
         else if (curIdx + dir !== nextIdx) { // there's moving space
           this.squares[nextIdx - dir].num = curSquare.num
           curSquare.num = 0
           nextIdx -= dir
+          justMoved = true
         }
         else { // no move
           nextIdx -= dir
@@ -143,7 +193,7 @@ class Vector {
       curIdx -= dir
     }
 
-    return score
+    return [score, justMoved]
   }
 }
 
