@@ -84,23 +84,15 @@ class Box {
     let res = 0
     switch (dir) {
       case 0:
+      case 2:
         for (let row of this.rows) {
-          res += this.moveVector(row, -1)
+          res += this.moveVector(row, dir - 1)
         }
         break
       case 1:
-        for (let column of this.columns) {
-          res += this.moveVector(column, -1)
-        }
-        break
-      case 2:
-        for (let row of this.rows) {
-          res += this.moveVector(row, 1)
-        }
-        break
       case 3:
         for (let column of this.columns) {
-          res += this.moveVector(column, 1)
+          res += this.moveVector(column, dir - 2)
         }
         break
       default:
