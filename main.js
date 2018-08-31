@@ -1,5 +1,4 @@
-
-const box = new Box(DIM)
+const box = new Box(N)
 box.populate()
 drawBox(box)
-document.onkeydown = checkKey
+document.onkeydown = onkeydown

@@ -1,4 +1,4 @@
-const DIM = 4
+const N = 4
 
 class Box {
   constructor(dim) {
@@ -47,8 +47,8 @@ class Box {
 
   populate() {
     this.unsetMerges()
-    const num = randomElemFromArr([2, 4])
-    const newSquare = randomElemFromArr(this.getEmptySquares())
+    const num = choice([2, 4])
+    const newSquare = choice(this.getEmptySquares())
     newSquare.num = num
   }
 

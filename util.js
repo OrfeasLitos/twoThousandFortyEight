@@ -1,4 +1,4 @@
-function randomElemFromArr(arr) {
+function choice(arr) {
   return arr[(Math.random() * arr.length) | 0]
 }
 
