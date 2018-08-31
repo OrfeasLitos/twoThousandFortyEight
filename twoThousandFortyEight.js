@@ -1,3 +1,5 @@
+const DIM = 4
+
 class Box {
   constructor(dim) {
     this.dim = dim

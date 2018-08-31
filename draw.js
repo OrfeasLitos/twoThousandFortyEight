@@ -1,3 +1,10 @@
+const TEXTSIZE = 50
+const W = canvas.width / N, H = canvas.height / N
+
+const ctx = canvas.getContext('2d')
+ctx.font = TEXTSIZE + 'px Arial'
+ctx.textAlign = 'center'
+
 function drawBox(box) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   if (box.full && !box.hasMerge) {
