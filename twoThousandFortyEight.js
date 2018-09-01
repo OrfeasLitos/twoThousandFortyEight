@@ -1,15 +1,20 @@
+const N = 4
+
 class Box {
   constructor(N) {
     this.N = N
-    this.model = Array(this.N).fill(Array(this.N).fill(0))
+    this.model = []
+    for (let i = 0; i < this.N; i++) {
+      this.model.push(Array(this.N).fill(0))
+    }
     //this.model = Array(this.N * this.N)
   }
 
-  function populate() {
-    const freeIndices = [], i, j
-    for (i = 0; i < this.N; i++) {
-      for (j = 0; j < this.N; j++) {
-        if (this.model[i][j] == 0) {
+  populate() {
+    const freeIndices = []
+    for (let i = 0; i < this.N; i++) {
+      for (let j = 0; j < this.N; j++) {
+        if (this.model[i][j] === 0) {
           freeIndices.push([i, j])
         }
       }
@@ -50,17 +55,17 @@ class Box {
     return true
   }
 
-  function move(dir) {
+  move(dir) {
     let model = this.model
     if (dir % 2) { // up or down
       model = transpose(model)
     }
     for (let i = 0; i < this.N; i++) {
       if (dir % 4 == 0) { // left or down
-        model[i] = squash(model[i].reverse()).reverse()
+        model[i] = this.squash(model[i].reverse()).reverse()
       }
       else {
-        model [i] = squash(model[i])
+        model [i] = this.squash(model[i])
       }
     }
     if (dir % 2) { // up or down
@@ -71,8 +76,8 @@ class Box {
     }
   }
 
-  function squash(row) {
-    const nums = row.filter(x => x), res = [], x
+  squash(row) {
+    const nums = row.filter(x => x), res = []
     let score = 0
     for (let x = nums.length - 2; x >= 0; x--) {
       if (nums[x] == nums[x + 1]) {
