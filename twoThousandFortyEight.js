@@ -19,8 +19,8 @@ class Box {
         }
       }
     }
-    const newIdx = choice(freeIndices)
-    this.model[newIdx] = choice([2, 4])
+    const indices = choice(freeIndices)
+    this.model[indices[0]][indices[1]] = choice([2, 4])
   }
 
   get gameOver() {
