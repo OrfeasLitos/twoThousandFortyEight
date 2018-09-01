@@ -14,9 +14,9 @@ function drawBox(box) {
                  (canvas.height + TEXTSIZE) / 2)
     return
   }
-  for (x = 0; x < box.dim; x++) {
-    for (y = 0; y < box.dim; y++) {
-      drawSquare(box.getSquare(x, y), x, y)
+  for (x = 0; x < box.N; x++) {
+    for (y = 0; y < box.N; y++) {
+      drawSquare(box.model[x][y], x, y)
     }
   }
 }
@@ -28,7 +28,7 @@ function drawSquare(square, x, y) {
   ctx.lineTo(W*x, H*(y + 1))
   ctx.lineTo(W*x, H*y)
   ctx.stroke()
-  if (square.num !== 0) {
-    ctx.fillText(square.num, W*(x + 0.5), H*(y + 0.5))
+  if (square !== 0) {
+    ctx.fillText(square, W*(x + 0.5), H*(y + 0.5))
   }
 }
