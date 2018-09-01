@@ -1,208 +1,92 @@
-const N = 4
-
 class Box {
-  constructor(dim) {
-    this.dim = dim
-    this.score = 0
-
-    this.squares = getArrayOfConstants(
-      this.dim * this.dim, () => new Square(0)
-    )
-    const rows = this.squares.reduce(
-      (acc, cur, i, arr) => {
-        if (i % this.dim === 0) {
-          acc.push(arr.slice(i, i + this.dim))
-        }
-        return acc
-      }, []
-    )
-    this.rows = rows.map(x => new Vector(x))
-    const columns = this.squares.reduce(
-      (acc, cur, i) => {
-        acc[i % this.dim].push(cur)
-        return acc
-      }, getArrayOfConstants(this.dim, () => [])
-    )
-    this.columns = columns.map(x => new Vector(x))
+  constructor(N) {
+    this.N = N
+    this.model = Array(this.N).fill(Array(this.N).fill(0))
+    //this.model = Array(this.N * this.N)
   }
 
-  unsetMerges() {
-    this.squares.map(square => square.merged = false)
+  function populate() {
+    const freeIndices = [], i, j
+    for (i = 0; i < this.N; i++) {
+      for (j = 0; j < this.N; j++) {
+        if (this.model[i][j] == 0) {
+          freeIndices.push([i, j])
+        }
+      }
+    }
+    const newIdx = choice(freeIndices)
+    this.model[newIdx] = choice([2, 4])
+  }
+
+  get gameOver() {
+    return this.full && !this.hasMerge
   }
 
   get hasMerge() {
-    const columnsNrows = this.columns.concat(this.rows)
-    return columnsNrows.reduce((acc, vec) => {
-          if (acc) {
-            return true
-          }
-          return vec.hasMerge
-        }, false)
+    for (let i = 0; i < this.N - 1; i++) {
+      for (let j = 0; j < this.N - 1; j++) {
+        if (this.model[i][j] == this.model[i][j + 1] ||
+            this.model[i][j] == this.model[i + 1][j]) {
+          return true
+        }
+      }
+    }
+    for (let j = 0; j < this.N - 1; j++) {
+      if (this.model[i][j] == this.model[i][j + 1]) {
+        return true
+      }
+    }
+    return false
   }
 
   get full() {
-    return this.getEmptySquares().length === 0
-  }
-
-
-  populate() {
-    this.unsetMerges()
-    const num = choice([2, 4])
-    const newSquare = choice(this.getEmptySquares())
-    newSquare.num = num
-  }
-
-  getEmptySquares() {
-    return this.squares.filter(square => !square.full)
-  }
-
-  print() {
-    let res = '';
-    for (let row = 0; row < this.dim; row++) {
-      for (let column = 0; column < this.dim; column++) {
-        res += this.getSquare(row, column).num
-        res += '  '
-      }
-      if (row !== this.dim - 1) {
-        res += '\n'
-      }
-    }
-    console.log(res)
-  }
-
-  getSquare(row, column) {
-    return this.squares[this.dim * column + row]
-  }
-
-  moveVector(vec, dir) {
-    const res = vec.move(dir)
-    this.score += res[0]
-    return res[1]
-  }
-
-  move(dir) {
-    let res = 0
-    switch (dir) {
-      case 0:
-      case 2:
-        for (let row of this.rows) {
-          res += this.moveVector(row, dir - 1)
+    for (let i = 0; i < this.N; i++) {
+      for (let j = 0; j < this.N; j++) {
+        if (this.model[i][j] == 0) {
+          return false
         }
-        break
-      case 1:
-      case 3:
-        for (let column of this.columns) {
-          res += this.moveVector(column, dir - 2)
-        }
-        break
-      default:
-        throw new RangeError("Box.move() accepts 0 - 3")
+      }
     }
-    return res
-  }
-}
-
-class Vector {
-  constructor(squares) {
-    this.size = squares.length
-    this.squares = squares
-    // Add walls
-    this.squares.unshift(new Square(-1))
-    this.squares.push(new Square(-1))
+    return true
   }
 
-  isWithinWalls(idx) {
-    return 0 < idx && idx <= this.size
-  }
-
-  get hasMerge() {
-    return this.squares.reduce((acc, square, i, vec) => {
-
-      // merge already found
-      if (acc) {
-        return true
-      }
-
-      // top/left wall, no merges
-      if (i === 0) {
-        return false
-      }
-
-      // down/right wall, pass on previous result
-      if (i === this.size + 1) {
-        return acc
-      }
-
-      // found available merge!
-      if (square.num === vec[i + 1].num) {
-        return true
-      }
-
-      // no merge here
-      return false
-    }, false) // no merges initially
-  }
-
-  move(dir) {
-    let nextIdx
-    let curIdx
-    let score = 0
-    let justMoved = false
-
-    if (dir === -1) {
-      nextIdx = 0
-      curIdx = 1
+  function move(dir) {
+    let model = this.model
+    if (dir % 2) { // up or down
+      model = transpose(model)
     }
-    else if (dir === 1) {
-      nextIdx = this.size + 1
-      curIdx = this.size
+    for (let i = 0; i < this.N; i++) {
+      if (dir % 4 == 0) { // left or down
+        model[i] = squash(model[i].reverse()).reverse()
+      }
+      else {
+        model [i] = squash(model[i])
+      }
+    }
+    if (dir % 2) { // up or down
+      this.model = transpose(model)
     }
     else {
-      throw new RangeError("move() accepts only -1 or 1")
+      this.model = model
     }
+  }
 
-    while (this.isWithinWalls(curIdx)) {
-      const curSquare = this.squares[curIdx]
-      const nextSquare = this.squares[nextIdx]
-
-      if (curSquare.full) { // there is something to move
-        if (curSquare.num === nextSquare.num &&
-            !nextSquare.merged) { // merge
-          curSquare.num = 0
-          nextSquare.merged = true
-          nextSquare.num *= 2
-          score += nextSquare.num
-          justMoved = true
-        }
-        else if (curIdx + dir !== nextIdx) { // there's moving space
-          this.squares[nextIdx - dir].num = curSquare.num
-          curSquare.num = 0
-          nextIdx -= dir
-          justMoved = true
-        }
-        else { // no move
-          nextIdx -= dir
-        }
+  function squash(row) {
+    const nums = row.filter(x => x), res = [], x
+    let score = 0
+    for (let x = nums.length - 2; x >= 0; x--) {
+      if (nums[x] == nums[x + 1]) {
+        res.push(nums[x + 1] * 2)
+        this.score += nums[x + 1] * 2
+        x--
       }
-      curIdx -= dir
+      else {
+        res.push(nums[x + 1])
+      }
     }
-
-    return [score, justMoved]
-  }
-}
-
-class Square {
-  constructor(row, col, n = 0) {
-    this.num = n
-    this.merged = false
-  }
-
-  set num(n) {
-    this.n = n
-    this.full = (n) ? true : false
-  }
-
-  get num() {
-    return this.n
+    if (x == -1) {
+      res.push(nums[0])
+    }
+    return Array(row.length - nums.length).fill(0).concat(res.reverse())
   }
 }
