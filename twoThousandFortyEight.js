@@ -27,6 +27,19 @@ class Box {
     return this.full && !this.hasMerge
   }
 
+  print() {
+    let str = ''
+    for (let i = 0; i < this.N; i++) {
+      for (let j = 0; j < this.N; j++) {
+        str = str + this.model[i][j] + '  '
+      }
+      if (i !== this.N - 1) {
+        str += '\n'
+      }
+    }
+    console.log(str)
+  }
+
   get hasMerge() {
     for (let i = 0; i < this.N - 1; i++) {
       for (let j = 0; j < this.N - 1; j++) {
