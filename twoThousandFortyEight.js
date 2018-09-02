@@ -93,9 +93,9 @@ class Box {
     return true
   }
 
-  squash(row) {
+  _squash(row) {
     const nums = row.filter(x => x), res = []
-    let score = 0, x
+    let x
     for (x = nums.length - 2; x >= 0; x--) {
       if (nums[x] == nums[x + 1]) {
         res.push(nums[x + 1] * 2)
@@ -109,6 +109,6 @@ class Box {
     if (x == -1) {
       res.push(nums[0])
     }
-    return Array(row.length - nums.length).fill(0).concat(res.reverse())
+    return Array(row.length - res.length).fill(0).concat(res.reverse())
   }
 }
