@@ -14,12 +14,12 @@ class Game {
     for (let i = 0; i < N; i++) {
       for (let j = 0; j < N; j++) {
         if (this.model[i][j] === 0) {
-          freeIndices.push([i, j])
+          freeIndices.push({i, j})
         }
       }
     }
     const indices = _.sample(freeIndices)
-    this.model[indices[0]][indices[1]] = _.sample([2, 4])
+    this.model[indices.i][indices.j] = _.sample([2, 4])
   }
 
   get gameOver() {
@@ -73,7 +73,7 @@ class Game {
     model = this.rotate(model, 4 - dir)
     model = this.squash(model)
     model = this.rotate(model, dir)
-    let changed = (_.isEqual(model, this.model)) ? false : true
+    let changed = !(_.isEqual(model, this.model))
     this.model = model
     return changed
   }
@@ -98,12 +98,12 @@ class Game {
 
   squash(matrix) {
     for (let i = 0; i < matrix.length; i++) {
-      matrix[i] = this._squash(matrix[i])
+      matrix[i] = this.squashRow(matrix[i])
     }
     return matrix
   }
 
-  _squash(row) {
+  squashRow(row) {
     const nums = row.filter(x => x), res = []
     let x
     for (x = 1; x <= nums.length; x++) {
