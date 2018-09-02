@@ -5,18 +5,18 @@ const ctx = canvas.getContext('2d')
 ctx.font = TEXTSIZE + 'px Arial'
 ctx.textAlign = 'center'
 
-function drawBox(box) {
+function drawGame(game) {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  if (box.gameOver) {
+  if (game.gameOver) {
     ctx.fillText('Game Over', canvas.width / 2,
                  (canvas.height - TEXTSIZE) / 2)
-    ctx.fillText(`score: ${box.score}`, canvas.width / 2,
+    ctx.fillText(`score: ${game.score}`, canvas.width / 2,
                  (canvas.height + TEXTSIZE) / 2)
     return
   }
-  for (let x = 0; x < box.N; x++) {
-    for (let y = 0; y < box.N; y++) {
-      drawSquare(box.model[x][y], y, x)
+  for (let x = 0; x < game.N; x++) {
+    for (let y = 0; y < game.N; y++) {
+      drawSquare(game.model[x][y], y, x)
     }
   }
 }

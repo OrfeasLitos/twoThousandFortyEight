@@ -1,4 +1,4 @@
-const box = new Box(N)
-box.populate()
-drawBox(box)
+const game = new Game(N)
+game.populate()
+drawGame(game)
 document.onkeydown = onkeydown

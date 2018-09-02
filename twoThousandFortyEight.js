@@ -1,8 +1,8 @@
 const N = 4
 
-class Box {
   constructor(N) {
     this.N = N
+class Game {
     this.score = 0
     this.model = []
     for (let i = 0; i < this.N; i++) {
