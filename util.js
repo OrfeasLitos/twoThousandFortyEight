@@ -15,8 +15,9 @@ function flat(arr) {
 
 function transpose(matrix) {
   const N = matrix.length
-  const result = Array(N).fill(Array(N))
+  const result = []
   for (let i = 0; i < N; i++) {
+    result.push(Array(N))
     for (let j = 0; j < N; j++) {
       result[i][j] = matrix[j][i]
     }
