@@ -69,25 +69,9 @@ class Box {
 
   move(dir) {
     let model = _.clone(this.model)
-    if (dir == 0) {
-      model = this.rotate(model, 2)
-      model = this.squash(model)
-      model = this.rotate(model, 2)
-    }
-    else if (dir == 1) {
-      model = this.rotate(model, 1)
-      model = this.squash(model)
-      model = this.rotate(model, 3)
-    }
-    else if (dir == 2) {
-    console.log("aa");
-      model = this.squash(model)
-    }
-    else if (dir == 3) {
-      model = this.rotate(model, 3)
-      model = this.squash(model)
-      model = this.rotate(model, 1)
-    }
+    model = this.rotate(model, 4 - dir)
+    model = this.squash(model)
+    model = this.rotate(model, dir)
     let changed = (_.isEqual(model, this.model)) ? false : true
     this.model = model
     return changed
@@ -121,19 +105,19 @@ class Box {
   _squash(row) {
     const nums = row.filter(x => x), res = []
     let x
-    for (x = nums.length - 2; x >= 0; x--) {
-      if (nums[x] == nums[x + 1]) {
-        res.push(nums[x + 1] * 2)
-        this.score += nums[x + 1] * 2
-        x--
+    for (x = 1; x <= nums.length; x++) {
+      if (nums[x] == nums[x - 1]) {
+        res.push(nums[x - 1] * 2)
+        this.score += nums[x - 1] * 2
+        x++
       }
       else {
-        res.push(nums[x + 1])
+        res.push(nums[x - 1])
       }
     }
     if (x == -1) {
-      res.push(nums[0])
+      res.push(nums[nums.length - 1])
     }
-    return Array(row.length - res.length).fill(0).concat(res.reverse())
+    return res.concat(Array(row.length - res.length).fill(0))
   }
 }
