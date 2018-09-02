@@ -3,6 +3,7 @@ const N = 4
 class Box {
   constructor(N) {
     this.N = N
+    this.score = 0
     this.model = []
     for (let i = 0; i < this.N; i++) {
       this.model.push(Array(this.N).fill(0))
@@ -40,7 +41,8 @@ class Box {
   }
 
   get hasMerge() {
-    for (let i = 0; i < this.N - 1; i++) {
+    let i
+    for (i = 0; i < this.N - 1; i++) {
       for (let j = 0; j < this.N - 1; j++) {
         if (this.model[i][j] == this.model[i][j + 1] ||
             this.model[i][j] == this.model[i + 1][j]) {
