@@ -73,18 +73,19 @@ class Box {
     if (dir % 2) { // up or down
       model = transpose(model)
     }
-    for (let i = 0; i < this.N; i++) {
-      if (dir % 4 == 0) { // left or down
+    if (dir <= 1) { // left or up
+      for (let i = 0; i < this.N; i++) {
         model[i] = this.squash(model[i].reverse()).reverse()
       }
-      else {
-        model [i] = this.squash(model[i])
+    }
+    else {
+      for (let i = 0; i < this.N; i++) {
+        model[i] = this.squash(model[i])
       }
     }
     if (dir % 2) { // up or down
       model = transpose(model)
     }
-    else {
     if (_.isEqual(model, this.model)) {
       this.model = model
       return false
