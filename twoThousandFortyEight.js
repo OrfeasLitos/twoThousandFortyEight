@@ -69,7 +69,7 @@ class Box {
   }
 
   move(dir) {
-    let model = this.model
+    let model = _.clone(this.model)
     if (dir % 2) { // up or down
       model = transpose(model)
     }
@@ -82,11 +82,15 @@ class Box {
       }
     }
     if (dir % 2) { // up or down
-      this.model = transpose(model)
+      model = transpose(model)
     }
     else {
+    if (_.isEqual(model, this.model)) {
       this.model = model
+      return false
     }
+    this.model = model
+    return true
   }
 
   squash(row) {
