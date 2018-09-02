@@ -7,7 +7,6 @@ class Box {
     for (let i = 0; i < this.N; i++) {
       this.model.push(Array(this.N).fill(0))
     }
-    //this.model = Array(this.N * this.N)
   }
 
   populate() {
