@@ -26,7 +26,7 @@ class Game {
     return this.full && !this.hasMerge
   }
 
-  print() {
+  toString() {
     let str = ''
     for (let i = 0; i < N; i++) {
       for (let j = 0; j < N; j++) {
@@ -36,7 +36,7 @@ class Game {
         str += '\n'
       }
     }
-    console.log(str)
+    return str
   }
 
   get hasMerge() {
