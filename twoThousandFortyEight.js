@@ -69,10 +69,11 @@ class Game {
   }
 
   move(dir) {
-    let model = _.clone(this.model)
-    model = this.rotate(model, 4 - dir)
-    model = this.squash(model)
+    let model = _.clone(this.model), score
+    model = this.rotate(model, 4 - dir);
+    {model, score} = this.squash(model)
     model = this.rotate(model, dir)
+    this.score += score
     let changed = !(_.isEqual(model, this.model))
     this.model = model
     return changed
@@ -97,19 +98,21 @@ class Game {
   }
 
   squash(matrix) {
+    let totalScore = 0, score
     for (let i = 0; i < matrix.length; i++) {
-      matrix[i] = this.squashRow(matrix[i])
+      {matrix[i], score} = this.squashRow(matrix[i])
+      totalScore += score
     }
-    return matrix
+    return {matrix, totalScore}
   }
 
   squashRow(row) {
     const nums = row.filter(x => x), res = []
-    let x
+    let x, score = 0
     for (x = 1; x <= nums.length; x++) {
       if (nums[x] == nums[x - 1]) {
         res.push(nums[x - 1] * 2)
-        this.score += nums[x - 1] * 2
+        score += nums[x - 1] * 2
         x++
       }
       else {
@@ -119,6 +122,6 @@ class Game {
     if (x == -1) {
       res.push(nums[nums.length - 1])
     }
-    return res.concat(Array(row.length - res.length).fill(0))
+    return {res.concat(Array(row.length - res.length).fill(0)), score}
   }
 }
