@@ -40,21 +40,9 @@ class Game {
   }
 
   get hasMerge() {
-    let i
-    for (i = 0; i < this.N - 1; i++) {
-      for (let j = 0; j < this.N - 1; j++) {
-        if (this.model[i][j] == this.model[i][j + 1] ||
-            this.model[i][j] == this.model[i + 1][j]) {
-          return true
-        }
-      }
-    }
-    for (let j = 0; j < this.N - 1; j++) {
-      if (this.model[i][j] == this.model[i][j + 1]) {
-        return true
-      }
-    }
-    return false
+    const noLeftMerge = _.isEqual(this.squash(this.model).matrix, this.model)
+    const noUpMerge = _.isEqual(this.squash(this.rotate(this.model, 1)).matrix, this.rotate(this.model, 1))
+    return !noLeftMerge || !noUpMerge
   }
 
   get full() {
