@@ -14,8 +14,8 @@ function drawGame(game) {
                  (canvas.height + TEXTSIZE) / 2)
     return
   }
-  for (let x = 0; x < game.N; x++) {
-    for (let y = 0; y < game.N; y++) {
+  for (let x = 0; x < N; x++) {
+    for (let y = 0; y < N; y++) {
       drawSquare(game.model[x][y], y, x)
     }
   }

@@ -1,19 +1,18 @@
 const N = 4
 
-  constructor(N) {
-    this.N = N
 class Game {
+  constructor() {
     this.score = 0
     this.model = []
-    for (let i = 0; i < this.N; i++) {
-      this.model.push(Array(this.N).fill(0))
+    for (let i = 0; i < N; i++) {
+      this.model.push(Array(N).fill(0))
     }
   }
 
   populate() {
     const freeIndices = []
-    for (let i = 0; i < this.N; i++) {
-      for (let j = 0; j < this.N; j++) {
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
         if (this.model[i][j] === 0) {
           freeIndices.push([i, j])
         }
@@ -29,11 +28,11 @@ class Game {
 
   print() {
     let str = ''
-    for (let i = 0; i < this.N; i++) {
-      for (let j = 0; j < this.N; j++) {
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
         str = str + this.model[i][j] + '  '
       }
-      if (i !== this.N - 1) {
+      if (i !== N - 1) {
         str += '\n'
       }
     }
@@ -59,8 +58,8 @@ class Game {
   }
 
   get full() {
-    for (let i = 0; i < this.N; i++) {
-      for (let j = 0; j < this.N; j++) {
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
         if (this.model[i][j] == 0) {
           return false
         }
