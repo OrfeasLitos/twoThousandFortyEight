@@ -14,9 +14,9 @@ function drawBox(box) {
                  (canvas.height + TEXTSIZE) / 2)
     return
   }
-  for (x = 0; x < box.N; x++) {
-    for (y = 0; y < box.N; y++) {
-      drawSquare(box.model[x][y], x, y)
+  for (let x = 0; x < box.N; x++) {
+    for (let y = 0; y < box.N; y++) {
+      drawSquare(box.model[x][y], y, x)
     }
   }
 }
