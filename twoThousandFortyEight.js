@@ -95,8 +95,8 @@ class Box {
 
   squash(row) {
     const nums = row.filter(x => x), res = []
-    let score = 0
-    for (let x = nums.length - 2; x >= 0; x--) {
+    let score = 0, x
+    for (x = nums.length - 2; x >= 0; x--) {
       if (nums[x] == nums[x + 1]) {
         res.push(nums[x + 1] * 2)
         this.score += nums[x + 1] * 2
