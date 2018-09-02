@@ -69,28 +69,53 @@ class Box {
 
   move(dir) {
     let model = _.clone(this.model)
-    if (dir % 2) { // up or down
-      model = transpose(model)
+    if (dir == 0) {
+      model = this.rotate(model, 2)
+      model = this.squash(model)
+      model = this.rotate(model, 2)
     }
-    if (dir <= 1) { // left or up
-      for (let i = 0; i < this.N; i++) {
-        model[i] = this.squash(model[i].reverse()).reverse()
-      }
+    else if (dir == 1) {
+      model = this.rotate(model, 1)
+      model = this.squash(model)
+      model = this.rotate(model, 3)
     }
-    else {
-      for (let i = 0; i < this.N; i++) {
-        model[i] = this.squash(model[i])
-      }
+    else if (dir == 2) {
+    console.log("aa");
+      model = this.squash(model)
     }
-    if (dir % 2) { // up or down
-      model = transpose(model)
+    else if (dir == 3) {
+      model = this.rotate(model, 3)
+      model = this.squash(model)
+      model = this.rotate(model, 1)
     }
-    if (_.isEqual(model, this.model)) {
-      this.model = model
-      return false
-    }
+    let changed = (_.isEqual(model, this.model)) ? false : true
     this.model = model
-    return true
+    return changed
+  }
+
+  rotate(matrix, n) {
+    for (let i = 0; i < n; i++) {
+      matrix = this._rotateOnce(matrix)
+    }
+    return matrix
+  }
+
+  _rotateOnce(matrix) {
+    const rotated = []
+    for (let i = 0; i < matrix.length; i++) {
+      rotated.push(Array(matrix.length))
+      for (let j = 0; j < matrix.length; j++) {
+        rotated[i][j] = matrix[matrix.length - 1 - j][i]
+      }
+    }
+    return rotated
+  }
+
+  squash(matrix) {
+    for (let i = 0; i < matrix.length; i++) {
+      matrix[i] = this._squash(matrix[i])
+    }
+    return matrix
   }
 
   _squash(row) {
