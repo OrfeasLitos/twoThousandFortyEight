@@ -40,8 +40,8 @@ class Game {
   }
 
   get hasMerge() {
-    const noLeftMerge = _.isEqual(this.squash(this.model).matrix, this.model)
-    const noUpMerge = _.isEqual(this.squash(this.rotate(this.model, 1)).matrix, this.rotate(this.model, 1))
+    const noLeftMerge = _.isEqual(squash(this.model).matrix, this.model)
+    const noUpMerge = _.isEqual(squash(rotate(this.model, 1)).matrix, rotate(this.model, 1))
     return !noLeftMerge || !noUpMerge
   }
 
@@ -58,61 +58,13 @@ class Game {
 
   move(dir) {
     let model = _.clone(this.model), score, squashed
-    model = this.rotate(model, 4 - dir);
-    squashed = this.squash(model)
+    model = rotate(model, 4 - dir)
+    squashed = squash(model)
     this.score += squashed.score
     model = squashed.matrix
-    model = this.rotate(model, dir)
+    model = rotate(model, dir)
     let changed = !(_.isEqual(model, this.model))
     this.model = model
     return changed
-  }
-
-  rotate(matrix, n) {
-    for (let i = 0; i < n; i++) {
-      matrix = this._rotateOnce(matrix)
-    }
-    return matrix
-  }
-
-  _rotateOnce(matrix) {
-    const rotated = []
-    for (let i = 0; i < matrix.length; i++) {
-      rotated.push(Array(matrix.length))
-      for (let j = 0; j < matrix.length; j++) {
-        rotated[i][j] = matrix[matrix.length - 1 - j][i]
-      }
-    }
-    return rotated
-  }
-
-  squash(matrix) {
-    let score = 0, squashed
-    for (let i = 0; i < matrix.length; i++) {
-      squashed = this.squashRow(matrix[i])
-      matrix[i] = squashed.row
-      score += squashed.score
-    }
-    return {matrix, score}
-  }
-
-  squashRow(line) {
-    const nums = line.filter(x => x), res = []
-    let x, score = 0
-    for (x = 1; x <= nums.length; x++) {
-      if (nums[x] == nums[x - 1]) {
-        res.push(nums[x - 1] * 2)
-        score += nums[x - 1] * 2
-        x++
-      }
-      else {
-        res.push(nums[x - 1])
-      }
-    }
-    if (x == -1) {
-      res.push(nums[nums.length - 1])
-    }
-    const row = res.concat(Array(line.length - res.length).fill(0))
-    return {row, score}
   }
 }
