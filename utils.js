@@ -17,13 +17,12 @@ function _rotateOnce(matrix) {
 }
 
 function squash(matrix) {
-  let score = 0, squashed
+  let totalScore = 0, score
   for (let i = 0; i < matrix.length; i++) {
-    squashed = squashRow(matrix[i])
-    matrix[i] = squashed.row
-    score += squashed.score
+    ({row: matrix[i], score} = squashRow(matrix[i]))
+    totalScore += score
   }
-  return {matrix, score}
+  return {matrix, score: totalScore}
 }
 
 function squashRow(line) {
@@ -42,6 +41,5 @@ function squashRow(line) {
   if (x == -1) {
     res.push(nums[nums.length - 1])
   }
-  const row = res.concat(Array(line.length - res.length).fill(0))
-  return {row, score}
+  return {row: res.concat(Array(line.length - res.length).fill(0)), score}
 }

@@ -57,11 +57,10 @@ class Game {
   }
 
   move(dir) {
-    let model = _.clone(this.model), score, squashed
-    model = rotate(model, 4 - dir)
-    squashed = squash(model)
-    this.score += squashed.score
-    model = squashed.matrix
+    let model = _.clone(this.model), score
+    model = rotate(model, 4 - dir);
+    ({matrix: model, score} = squash(model))
+    this.score += score
     model = rotate(model, dir)
     let changed = !(_.isEqual(model, this.model))
     this.model = model
