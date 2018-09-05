@@ -1,3 +1,4 @@
+//test()
 const game = new Game()
 game.populate()
 drawGame(game)
